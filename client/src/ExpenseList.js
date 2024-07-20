@@ -13,7 +13,7 @@ let API_URL = 'http://localhost:5000/api/';
 if (process.env.NODE_ENV === 'development') {
   API_URL = 'http://localhost:5000/api/';
 } else {
-  API_URL = 'https://expenses-tracker-duhu.onrender.com/api/';
+  API_URL = 'https://expenses-tracker-api-pn4x.onrender.com/api/';
 }
 
 useEffect(() => {
