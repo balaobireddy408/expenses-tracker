@@ -15,11 +15,19 @@ const AddExpense = () => {
   const { personName } = useParams();
   const navigate = useNavigate();
 
+  let API_URL = 'http://localhost:5000/api/';
+
+  if (process.env.NODE_ENV === 'development') {
+    API_URL = 'http://localhost:5000/api/';
+  } else {
+    API_URL = 'https://expenses-tracker-duhu.onrender.com/api/';
+  }
+
   useEffect(() => {
     if (personName) {
       const decodedPersonName = decodeURIComponent(personName);
       axios
-        .get(`http://localhost:5000/api/expenses/${decodedPersonName}`)
+        .get(API_URL + `expenses/${decodedPersonName}`)
         .then((response) => {
           if (response.data.length > 0) {
             setExpense(response.data[0]);
@@ -45,8 +53,8 @@ const AddExpense = () => {
   const handleSave = () => {
     if (personName) {
       axios
-        .put(
-          `http://localhost:5000/api/expenses/${decodeURIComponent(
+        .put(API_URL+
+          `expenses/${decodeURIComponent(
             personName
           )}`,
           expense
@@ -61,7 +69,7 @@ const AddExpense = () => {
         });
     } else {
       axios
-        .post('http://localhost:5000/api/expenses/', expense)
+        .post(API_URL+'expenses/', expense)
         .then((response) => {
           alert('Expense added successfully');
           navigate('/');

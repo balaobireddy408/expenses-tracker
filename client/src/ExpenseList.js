@@ -8,28 +8,36 @@ function ExpenseList() {
   const [expenses, setExpenses] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/expenses');
-        setExpenses(response.data);
-      } catch (error) {
-        console.error('Error fetching expenses:', error);
-      }
-    };
-    fetchExpenses();
-  }, []);
+let API_URL = 'http://localhost:5000/api/';
 
-  const handleDelete = async (personName) => {
+if (process.env.NODE_ENV === 'development') {
+  API_URL = 'http://localhost:5000/api/';
+} else {
+  API_URL = 'https://expenses-tracker-duhu.onrender.com/api/';
+}
+
+useEffect(() => {
+  const fetchExpenses = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/expenses/${personName}`);
-      setExpenses(
-        expenses.filter((expense) => expense.personName !== personName)
-      ); // Update local state
+      const response = await axios.get(API_URL + 'expenses');
+      setExpenses(response.data);
     } catch (error) {
-      console.error('Error deleting expense:', error);
+      console.error('Error fetching expenses:', error);
     }
   };
+  fetchExpenses();
+}, []);
+
+const handleDelete = async (personName) => {
+  try {
+    await axios.delete(API_URL + `expenses/${personName}`);
+    setExpenses(
+      expenses.filter((expense) => expense.personName !== personName)
+    ); // Update local state
+  } catch (error) {
+    console.error('Error deleting expense:', error);
+  }
+};
 
   const navigateToEdit = (personName) => {
     const encodedPersonName = encodeURIComponent(personName);

@@ -59,6 +59,30 @@ app.get('/api/expenses', async (req, res) => {
   }
 });
 
+// Get expenses by personName
+app.get('/api/expenses/:personName', async (req, res) => {
+  try {
+    const { personName } = req.params;
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
+    const worksheet = workbook.worksheets[0];
+    const jsonData = worksheet.getSheetValues(); // Adjust if needed
+      const expenses = jsonData.slice(1).map((row) => ({
+        personName: row[1],
+        amount: row[2],
+        givenDate: row[3],
+        returnDate: row[4],
+        interest: row[5],
+        remarks: row[6],
+      }));
+    const filteredExpenses = expenses.filter(expense => expense.personName.toLowerCase() === personName.toLowerCase());
+    res.json(filteredExpenses);
+  } catch (error) {
+    console.error('Error reading Excel file:', error);
+    res.status(500).json({ error: 'Failed to read Excel file' });
+  }
+});
+
 // Add new expenses to the Excel file
 app.post('/api/expenses', async (req, res) => {
   try {
