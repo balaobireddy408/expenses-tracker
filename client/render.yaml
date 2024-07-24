@@ -1,0 +1,7 @@
+services:
+  - type: web
+    runtime: node  # Specify the Node.js runtime version
+    name: expenses-tracker
+    buildCommand: npm run build
+    startCommand: serve -s build
+
