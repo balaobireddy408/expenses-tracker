@@ -26,6 +26,7 @@ h1 {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  text-decoration: none; 
 }
 
 .add-expense-button:hover {
@@ -115,8 +116,16 @@ h1 {
   border-radius: 8px;
   padding: 15px; /* Padding for each item */
   margin: 5px; /* Space between items */
-  background-color: #f9f9f9; /* Background color for mobile items */
+  background-color: #edd1d1; /* Background color for mobile items */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+}
+
+/* Hover effect for mobile items */
+.mobile-expense-item:hover,
+.mobile-expense-item.active {
+  background-color: #e0f7fa; /* Light blue background on hover/tap */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Deeper shadow on hover/tap */
 }
 
 .mobile-line {
