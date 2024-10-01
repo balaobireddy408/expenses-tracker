@@ -1,7 +1,7 @@
 // src/ExpenseList.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ExpenseList.css'; // Import CSS file
 
 function ExpenseList() {
@@ -135,7 +135,7 @@ function ExpenseList() {
               <div className='mobile-line'>
                 <span>Interest :</span>
                 <span>
-                  {expense.interest && expense.interest != 0
+                  {expense.interest && expense.interest !== 0
                     ? expense.interest + ' rupee'
                     : 'zero rupee'}
                 </span>
@@ -146,6 +146,20 @@ function ExpenseList() {
                   <span>{expense.remarks}</span>
                 </div>
               )}
+              <div className='mobile-actions'>
+                <button
+                  className='edit-button mr-10'
+                  onClick={() => navigateToEdit(expense.personName)}
+                >
+                  Edit
+                </button>
+                <button
+                  className='delete-button'
+                  onClick={() => handleDelete(expense.personName)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>

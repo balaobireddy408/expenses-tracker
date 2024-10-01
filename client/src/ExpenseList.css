@@ -72,6 +72,15 @@ h1 {
   justify-content: space-between;
 }
 
+.mr-10{
+  margin-right: 10px !important;
+}
+
+.mobile-actions {
+  display: flex;
+  float:right;
+}
+
 .edit-button,
 .delete-button {
   padding: 4px 8px; /* Reduced padding for smaller buttons */
