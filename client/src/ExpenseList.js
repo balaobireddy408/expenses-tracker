@@ -50,6 +50,8 @@ const handleDelete = async (personName) => {
       <Link to='/add-expense'>
         <button className='add-expense-button'>Add Expense</button>
       </Link>
+
+      {/* Desktop Table View */}
       <table className='expense-table'>
         <thead>
           <tr>
@@ -59,7 +61,7 @@ const handleDelete = async (personName) => {
             <th>Return Date</th>
             <th>Interest</th>
             <th>Remarks</th>
-            <th>Actions</th> {/* New column for actions */}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -97,6 +99,39 @@ const handleDelete = async (personName) => {
           ))}
         </tbody>
       </table>
+
+      {/* Mobile View */}
+      <div className='mobile-view'>
+        <div className='mobile-expense-container'>
+          {expenses?.map((expense) => (
+            <div className='mobile-expense-item' key={expense.personName}>
+              <div className='mobile-line'>
+                <span>{expense.personName}</span>
+                <span>{expense.amount}</span>
+              </div>
+              <div className='mobile-line'>
+                <span>
+                  {expense.givenDate
+                    ? new Date(expense.givenDate).toLocaleDateString()
+                    : '--'}
+                </span>
+                <span>
+                  {expense.returnDate
+                    ? new Date(expense.returnDate).toLocaleDateString()
+                    : '--'}
+                </span>
+                <span>{expense.interest ? expense.interest : 0}</span>
+              </div>
+              {expense.remarks && (
+                <div className='mobile-line'>
+                  <span>Remarks:</span>
+                  <span>{expense.remarks}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
