@@ -10,7 +10,7 @@ function App() {
       <div>
         <Routes>
           <Route path='/add-expense' element={<AddExpense />} />
-          <Route path='/edit-expense/:personName' element={<AddExpense />} />
+          <Route path='/edit-expense/:guid' element={<AddExpense />} />
           <Route path='/' element={<ExpenseList />} />
         </Routes>
       </div>

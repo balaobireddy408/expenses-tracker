@@ -11,10 +11,11 @@ const AddExpense = () => {
     returnDate: '',
     interest: '',
     remarks: '',
+    guid: '',
   });
-  const { personName } = useParams();
+  const { guid } = useParams();
   const navigate = useNavigate();
-
+  console.log('guid', guid);
   let API_URL = 'http://localhost:5000/api/';
 
   if (process.env.NODE_ENV === 'development') {
@@ -24,10 +25,9 @@ const AddExpense = () => {
   }
 
   useEffect(() => {
-    if (personName) {
-      const decodedPersonName = decodeURIComponent(personName);
+    if (guid) {
       axios
-        .get(API_URL + `expenses/${decodedPersonName}`)
+        .get(API_URL + `expenses/${guid}`)
         .then((response) => {
           if (response.data.length > 0) {
             setExpense(response.data[0]);
@@ -40,7 +40,7 @@ const AddExpense = () => {
           alert('Failed to fetch expense details');
         });
     }
-  }, [personName]);
+  }, [guid]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,15 +50,15 @@ const AddExpense = () => {
     }));
   };
 
+  const generateShortGUID = () => {
+    // Generate a random number between 10000 and 99999 (inclusive)
+    return Math.floor(10000 + Math.random() * 90000).toString();
+  };
+
   const handleSave = () => {
-    if (personName) {
+    if (guid) {
       axios
-        .put(API_URL+
-          `expenses/${decodeURIComponent(
-            personName
-          )}`,
-          expense
-        )
+        .put(API_URL + `expenses/${guid}`, expense)
         .then((response) => {
           alert('Expense updated successfully');
           navigate('/');
@@ -68,8 +68,9 @@ const AddExpense = () => {
           alert('Failed to update expense');
         });
     } else {
+      expense.guid = generateShortGUID();
       axios
-        .post(API_URL+'expenses/', expense)
+        .post(API_URL + 'expenses/', expense)
         .then((response) => {
           alert('Expense added successfully');
           navigate('/');
@@ -87,7 +88,7 @@ const AddExpense = () => {
 
   return (
     <div className='container'>
-      <h2>{personName ? 'Edit Expense' : 'Add Expense'}</h2>
+      <h2>{guid ? 'Edit Expense' : 'Add Expense'}</h2>
       <form>
         <div className='form-group'>
           <label>Person Name:</label>
@@ -96,7 +97,7 @@ const AddExpense = () => {
             name='personName'
             value={expense.personName}
             onChange={handleChange}
-            disabled={!!personName}
+            disabled={!!guid}
           />
         </div>
         <div className='form-group'>

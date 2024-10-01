@@ -22,12 +22,10 @@ function ExpenseList() {
     handleFilter(1);
   }, []);
 
-  const handleDelete = async (personName) => {
+  const handleDelete = async (guid) => {
     try {
-      await axios.delete(API_URL + `expenses/${personName}`);
-      setExpenses(
-        expenses.filter((expense) => expense.personName !== personName)
-      ); // Update local state
+      await axios.delete(API_URL + `expenses/${guid}`);
+      setExpenses(expenses.filter((expense) => expense.guid !== guid)); // Update local state
     } catch (error) {
       console.error('Error deleting expense:', error);
     }
@@ -50,9 +48,9 @@ function ExpenseList() {
     }
   };
 
-  const navigateToEdit = (personName) => {
-    const encodedPersonName = encodeURIComponent(personName);
-    navigate(`/edit-expense/${encodedPersonName}`);
+  const navigateToEdit = (guid) => {
+    console.log('guid', guid);
+    navigate(`/edit-expense/${guid}`);
   };
 
   return (
@@ -117,13 +115,13 @@ function ExpenseList() {
               <td className='actions'>
                 <button
                   className='edit-button'
-                  onClick={() => navigateToEdit(expense.personName)}
+                  onClick={() => navigateToEdit(expense.guid)}
                 >
                   <i className='fas fa-edit'></i>
                 </button>
                 <button
                   className='delete-button'
-                  onClick={() => handleDelete(expense.personName)}
+                  onClick={() => handleDelete(expense.guid)}
                 >
                   <i className='fas fa-trash'></i>
                 </button>
@@ -179,13 +177,13 @@ function ExpenseList() {
               <div className='mobile-actions'>
                 <button
                   className='edit-button mr-10'
-                  onClick={() => navigateToEdit(expense.personName)}
+                  onClick={() => navigateToEdit(expense.guid)}
                 >
                   Edit
                 </button>
                 <button
                   className='delete-button'
-                  onClick={() => handleDelete(expense.personName)}
+                  onClick={() => handleDelete(expense.guid)}
                 >
                   Delete
                 </button>

@@ -20,7 +20,8 @@ const checkHeaders = async (worksheet) => {
     headers.includes('Given Date') &&
     headers.includes('Return Date') &&
     headers.includes('Interest') &&
-    headers.includes('Remarks')
+    headers.includes('Remarks') &&
+    headers.includes('GUID')
   );
 };
 
@@ -48,6 +49,7 @@ app.get('/api/expenses', async (req, res) => {
           returnDate: row.getCell(4).value,
           interest: row.getCell(5).value,
           remarks: row.getCell(6).value,
+          guid: row.getCell(7).value,
         });
       }
     });
@@ -60,22 +62,25 @@ app.get('/api/expenses', async (req, res) => {
 });
 
 // Get expenses by personName
-app.get('/api/expenses/:personName', async (req, res) => {
+app.get('/api/expenses/:guid', async (req, res) => {
   try {
-    const { personName } = req.params;
+    const { guid } = req.params;
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(filePath);
     const worksheet = workbook.worksheets[0];
     const jsonData = worksheet.getSheetValues(); // Adjust if needed
-      const expenses = jsonData.slice(1).map((row) => ({
-        personName: row[1],
-        amount: row[2],
-        givenDate: row[3],
-        returnDate: row[4],
-        interest: row[5],
-        remarks: row[6],
-      }));
-    const filteredExpenses = expenses.filter(expense => expense.personName.toLowerCase() === personName.toLowerCase());
+    const expenses = jsonData.slice(1).map((row) => ({
+      personName: row[1],
+      amount: row[2],
+      givenDate: row[3],
+      returnDate: row[4],
+      interest: row[5],
+      remarks: row[6],
+      guid: row[7],
+    }));
+    const filteredExpenses = expenses.filter(
+      (expense) => expense.guid === guid
+    );
     res.json(filteredExpenses);
   } catch (error) {
     console.error('Error reading Excel file:', error);
@@ -111,6 +116,7 @@ app.post('/api/expenses', async (req, res) => {
         'Return Date',
         'Interest',
         'Remarks',
+        'GUID',
       ]);
     }
 
@@ -123,6 +129,7 @@ app.post('/api/expenses', async (req, res) => {
         expense.returnDate,
         expense.interest,
         expense.remarks,
+        expense.guid,
       ]);
     });
 
@@ -135,9 +142,9 @@ app.post('/api/expenses', async (req, res) => {
 });
 
 // Update expense by personName
-app.put('/api/expenses/:personName', async (req, res) => {
+app.put('/api/expenses/:guid', async (req, res) => {
   try {
-    const { personName } = req.params;
+    const { guid } = req.params;
     const updatedExpense = req.body;
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(filePath);
@@ -154,7 +161,7 @@ app.put('/api/expenses/:personName', async (req, res) => {
     let found = false;
 
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (row.getCell(1).value === personName) {
+      if (row.getCell(7).value === guid) {
         worksheet.getRow(rowNumber).values = [
           updatedExpense.personName,
           updatedExpense.amount,
@@ -162,6 +169,7 @@ app.put('/api/expenses/:personName', async (req, res) => {
           updatedExpense.returnDate,
           updatedExpense.interest,
           updatedExpense.remarks,
+          updatedExpense.guid,
         ];
         found = true;
       }
@@ -180,9 +188,9 @@ app.put('/api/expenses/:personName', async (req, res) => {
 });
 
 // Delete expense by personName
-app.delete('/api/expenses/:personName', async (req, res) => {
+app.delete('/api/expenses/:guid', async (req, res) => {
   try {
-    const { personName } = req.params;
+    const { guid } = req.params;
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(filePath);
     const worksheet = workbook.worksheets[0];
@@ -198,7 +206,7 @@ app.delete('/api/expenses/:personName', async (req, res) => {
     let rowToDelete = null;
 
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (row.getCell(1).value === personName) {
+      if (row.getCell(7).value === guid) {
         rowToDelete = rowNumber;
       }
     });
