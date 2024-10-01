@@ -20,7 +20,7 @@ const AddExpense = () => {
   if (process.env.NODE_ENV === 'development') {
     API_URL = 'http://localhost:5000/api/';
   } else {
-    API_URL = 'https://expenses-tracker-api-pn4x.onrender.com/api/';
+    API_URL = 'https://expenses-tracker-api-hl2m.onrender.com/api/';
   }
 
   useEffect(() => {
