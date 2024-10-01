@@ -33,6 +33,24 @@ h1 {
   background-color: #45a045;
 }
 
+.filter-button {
+  display: block;
+  margin: 0 auto 20px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #e7e7e7;
+  color: #a7a3ed;;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter-button:hover,
+.filter-button.active {
+  background-color: #edd1d1;
+}
+
 .no-expense-message {
   text-align: center;
   font-size: 18px;

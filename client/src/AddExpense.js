@@ -129,7 +129,7 @@ const AddExpense = () => {
         <div className='form-group'>
           <label>Interest:</label>
           <input
-            type='text'
+            type='number'
             name='interest'
             value={expense.interest}
             onChange={handleChange}

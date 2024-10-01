@@ -8,6 +8,7 @@ function ExpenseList() {
   const [expenses, setExpenses] = useState([]);
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
+  const [activeFilter, setActiveFilter] = useState(1);
 
   let API_URL = 'http://localhost:5000/api/';
 
@@ -18,15 +19,7 @@ function ExpenseList() {
   }
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const response = await axios.get(API_URL + 'expenses');
-        setExpenses(response.data);
-      } catch (error) {
-        console.error('Error fetching expenses:', error);
-      }
-    };
-    fetchExpenses();
+    handleFilter(1);
   }, []);
 
   const handleDelete = async (personName) => {
@@ -40,6 +33,23 @@ function ExpenseList() {
     }
   };
 
+  const handleFilter = async (interest) => {
+    let filterRes = [];
+    try {
+      setActiveFilter(interest);
+      await axios.get(API_URL + 'expenses').then((response) => {
+        if (interest === 0) {
+          filterRes = response?.data?.filter((exp) => exp.interest === '0');
+        } else {
+          filterRes = response?.data?.filter((exp) => exp.interest !== '0');
+        }
+        setExpenses(filterRes);
+      });
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
+  };
+
   const navigateToEdit = (personName) => {
     const encodedPersonName = encodeURIComponent(personName);
     navigate(`/edit-expense/${encodedPersonName}`);
@@ -48,12 +58,32 @@ function ExpenseList() {
   return (
     <div className='expense-list-container'>
       <h1>Expense List</h1>
-      <button
-        className='add-expense-button'
-        onClick={() => navigate('/add-expense')}
-      >
-        Add Expense
-      </button>
+      <div className='actions'>
+        <button
+          className='add-expense-button'
+          onClick={() => navigate('/add-expense')}
+        >
+          Add
+        </button>
+        <div className='actions'>
+          <button
+            className={`filter-button mr-10 ${
+              activeFilter === 0 ? 'active' : ''
+            }`}
+            id='option1'
+            onClick={() => handleFilter(0)}
+          >
+            zero
+          </button>
+          <button
+            className={`filter-button ${activeFilter === 1 ? 'active' : ''}`}
+            id='option2'
+            onClick={() => handleFilter(1)}
+          >
+            no zero
+          </button>
+        </div>
+      </div>
       {/* Desktop Table View */}
       <table className='expense-table'>
         <thead>
