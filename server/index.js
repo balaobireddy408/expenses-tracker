@@ -81,8 +81,6 @@ app.put('/api/expenses/:guid', async (req, res) => {
   const { guid } = req.params;
   const { personname, amount, givendate, returndate, interest, remarks } =
     req.body;
-
-  console.log(req.body);
   try {
     const result = await pool.query(
       'UPDATE expenses SET personname = $1, amount = $2, givendate = $3, returndate = $4, interest = $5, remarks = $6 WHERE guid = $7',
