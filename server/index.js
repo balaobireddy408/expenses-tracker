@@ -63,12 +63,12 @@ app.post('/api/expenses', async (req, res) => {
   const { personname, amount, givendate, returndate, interest, remarks, guid } =
     req.body;
   try {
-    const givenDate = givendate === '' ? null : givendate;
-    const returnDate = returndate === '' ? null : returndate;
+    const fromDate = givendate === '' ? null : givendate;
+    const toDate = returndate === '' ? null : returndate;
 
     await pool.query(
       'INSERT INTO expenses (personname, amount, givendate, returndate, interest, remarks, guid) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-      [personname, amount, givenDate, returnDate, interest, remarks, guid]
+      [personname, amount, fromDate, toDate, interest, remarks, guid]
     );
     res.json({ message: 'Expense added successfully' });
   } catch (error) {
@@ -81,6 +81,8 @@ app.put('/api/expenses/:guid', async (req, res) => {
   const { guid } = req.params;
   const { personname, amount, givendate, returndate, interest, remarks } =
     req.body;
+
+  console.log(req.body);
   try {
     const result = await pool.query(
       'UPDATE expenses SET personname = $1, amount = $2, givendate = $3, returndate = $4, interest = $5, remarks = $6 WHERE guid = $7',

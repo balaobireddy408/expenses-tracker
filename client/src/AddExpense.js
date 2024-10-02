@@ -113,7 +113,7 @@ const AddExpense = () => {
           <label>Given Date:</label>
           <input
             type='date'
-            name='givenDate'
+            name='givendate'
             value={expense.givendate}
             onChange={handleChange}
           />
@@ -122,7 +122,7 @@ const AddExpense = () => {
           <label>Return Date:</label>
           <input
             type='date'
-            name='returnDate'
+            name='returndate'
             value={expense.returndate}
             onChange={handleChange}
           />
