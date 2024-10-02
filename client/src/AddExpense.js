@@ -15,7 +15,7 @@ const AddExpense = () => {
   });
   const { guid } = useParams();
   const navigate = useNavigate();
-  console.log('guid', guid);
+
   let API_URL = 'http://localhost:5000/api/';
 
   if (process.env.NODE_ENV === 'development') {

@@ -17,7 +17,7 @@ h1 {
 
 .add-expense-button {
   display: block;
-  margin: 0 auto 20px;
+  /* margin: 0 auto 20px; */
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -35,7 +35,7 @@ h1 {
 
 .filter-button {
   display: block;
-  margin: 0 auto 20px;
+  /* margin: 0 auto 20px; */
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -44,6 +44,10 @@ h1 {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+.mt-20{
+  margin-top: 20px;
 }
 
 .filter-button:hover,
@@ -164,6 +168,10 @@ h1 {
 /* Responsive Styles */
 @media (max-width: 768px) {
   .expense-table {
+    display: none; /* Hide table on mobile */
+  }
+
+  .no-record-found {
     display: none; /* Hide table on mobile */
   }
 

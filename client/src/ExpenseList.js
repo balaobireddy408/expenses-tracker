@@ -83,57 +83,63 @@ function ExpenseList() {
         </div>
       </div>
       {/* Desktop Table View */}
-      <table className='expense-table'>
-        <thead>
-          <tr>
-            <th>Person Name</th>
-            <th>Amount</th>
-            <th>Given Date</th>
-            <th>Return Date</th>
-            <th>Interest</th>
-            <th>Remarks</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses?.map((expense) => (
-            <tr key={expense.personname}>
-              <td>{expense.personname}</td>
-              <td>{expense.amount}</td>
-              <td>
-                {expense.givendate
-                  ? new Date(expense.givendate).toLocaleDateString()
-                  : '--'}
-              </td>
-              <td>
-                {expense.returndate
-                  ? new Date(expense.returndate).toLocaleDateString()
-                  : '--'}
-              </td>
-              <td>{expense.interest ? expense.interest : 0}</td>
-              <td>{expense.remarks ? expense.remarks : '--'}</td>
-              <td className='actions'>
-                <button
-                  className='edit-button'
-                  onClick={() => navigateToEdit(expense.guid)}
-                >
-                  <i className='fas fa-edit'></i>
-                </button>
-                <button
-                  className='delete-button'
-                  onClick={() => handleDelete(expense.guid)}
-                >
-                  <i className='fas fa-trash'></i>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
+      {expenses.length == 0 && (
+        <div className='no-record-found mt-20'>No records found</div>
+      )}
+      {expenses.length > 0 && (
+        <table className='expense-table'>
+          <thead>
+            <tr>
+              <th>Person Name</th>
+              <th>Amount</th>
+              <th>Given Date</th>
+              <th>Return Date</th>
+              <th>Interest</th>
+              <th>Remarks</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expenses?.map((expense) => (
+              <tr key={expense.personname}>
+                <td>{expense.personname}</td>
+                <td>{expense.amount}</td>
+                <td>
+                  {expense.givendate
+                    ? new Date(expense.givendate).toLocaleDateString()
+                    : '--'}
+                </td>
+                <td>
+                  {expense.returndate
+                    ? new Date(expense.returndate).toLocaleDateString()
+                    : '--'}
+                </td>
+                <td>{expense.interest ? expense.interest : 0}</td>
+                <td>{expense.remarks ? expense.remarks : '--'}</td>
+                <td className='actions'>
+                  <button
+                    className='edit-button'
+                    onClick={() => navigateToEdit(expense.guid)}
+                  >
+                    <i className='fas fa-edit'></i>
+                  </button>
+                  <button
+                    className='delete-button'
+                    onClick={() => handleDelete(expense.guid)}
+                  >
+                    <i className='fas fa-trash'></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {/* Mobile View */}
       <div className='mobile-view'>
         <div className='mobile-expense-container'>
+          {expenses.length == 0 && <div>No records found</div>}
           {expenses?.map((expense, index) => (
             <div
               className={`mobile-expense-item ${
