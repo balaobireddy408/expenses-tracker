@@ -97,17 +97,17 @@ function ExpenseList() {
         </thead>
         <tbody>
           {expenses?.map((expense) => (
-            <tr key={expense.personName}>
-              <td>{expense.personName}</td>
+            <tr key={expense.personname}>
+              <td>{expense.personname}</td>
               <td>{expense.amount}</td>
               <td>
-                {expense.givenDate
-                  ? new Date(expense.givenDate).toLocaleDateString()
+                {expense.givendate
+                  ? new Date(expense.givendate).toLocaleDateString()
                   : '--'}
               </td>
               <td>
-                {expense.returnDate
-                  ? new Date(expense.returnDate).toLocaleDateString()
+                {expense.returndate
+                  ? new Date(expense.returndate).toLocaleDateString()
                   : '--'}
               </td>
               <td>{expense.interest ? expense.interest : 0}</td>
@@ -139,24 +139,24 @@ function ExpenseList() {
               className={`mobile-expense-item ${
                 activeIndex === index ? 'active' : ''
               }`}
-              key={expense.personName}
+              key={expense.personname}
               onClick={() =>
                 setActiveIndex(activeIndex === index ? null : index)
               } // Toggle active state
             >
               <div className='mobile-line'>
-                <span>{expense.personName}</span>
+                <span>{expense.personname}</span>
                 <span>{expense.amount}</span>
               </div>
               <div className='mobile-line'>
                 <span>
-                  {expense.givenDate
-                    ? new Date(expense.givenDate).toLocaleDateString()
+                  {expense.givendate
+                    ? new Date(expense.givendate).toLocaleDateString()
                     : '--'}
                 </span>
                 <span>
-                  {expense.returnDate
-                    ? new Date(expense.returnDate).toLocaleDateString()
+                  {expense.returndate
+                    ? new Date(expense.returndate).toLocaleDateString()
                     : '--'}
                 </span>
               </div>

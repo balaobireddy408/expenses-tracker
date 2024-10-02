@@ -5,10 +5,10 @@ import './AddExpense.css';
 
 const AddExpense = () => {
   const [expense, setExpense] = useState({
-    personName: '',
+    personname: '',
     amount: '',
-    givenDate: '',
-    returnDate: '',
+    givendate: '',
+    returndate: '',
     interest: '',
     remarks: '',
     guid: '',
@@ -52,7 +52,7 @@ const AddExpense = () => {
 
   const generateShortGUID = () => {
     // Generate a random number between 10000 and 99999 (inclusive)
-    return Math.floor(10000 + Math.random() * 90000).toString();
+    return 'GU-' + Math.floor(10000 + Math.random() * 90000).toString();
   };
 
   const handleSave = () => {
@@ -94,8 +94,8 @@ const AddExpense = () => {
           <label>Person Name:</label>
           <input
             type='text'
-            name='personName'
-            value={expense.personName}
+            name='personname'
+            value={expense.personname}
             onChange={handleChange}
             disabled={!!guid}
           />
@@ -114,7 +114,7 @@ const AddExpense = () => {
           <input
             type='date'
             name='givenDate'
-            value={expense.givenDate}
+            value={expense.givendate}
             onChange={handleChange}
           />
         </div>
@@ -123,7 +123,7 @@ const AddExpense = () => {
           <input
             type='date'
             name='returnDate'
-            value={expense.returnDate}
+            value={expense.returndate}
             onChange={handleChange}
           />
         </div>

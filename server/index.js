@@ -1,230 +1,118 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const ExcelJS = require('exceljs');
-const path = require('path');
 const cors = require('cors');
+const { Pool } = require('pg'); // Import PostgreSQL client
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Enable CORS and body parsing
 app.use(cors());
 app.use(bodyParser.json());
 
-const filePath = path.join(__dirname, 'expenses.xlsx');
+// PostgreSQL connection setup (use environment variables for security)
+const pool = new Pool({
+  connectionString:
+    'postgresql://expense_db_4pn9_user:boiCXdmyIMa3IGYy4tEZ8zKYx2hi6ufF@dpg-cruhmk3v2p9s73erldvg-a.oregon-postgres.render.com/expense_db_4pn9',
+  ssl: {
+    rejectUnauthorized: false, // For secure connections
+  },
+});
 
-// Helper function to check if headers exist
-const checkHeaders = async (worksheet) => {
-  const headers = worksheet.getRow(1).values.slice(1); // Get headers from the first row
-  return (
-    headers.includes('Person Name') &&
-    headers.includes('Amount') &&
-    headers.includes('Given Date') &&
-    headers.includes('Return Date') &&
-    headers.includes('Interest') &&
-    headers.includes('Remarks') &&
-    headers.includes('GUID')
-  );
+// Function to connect to the pool
+const connectDb = async () => {
+  try {
+    const client = await pool.connect();
+    console.log('Connected to PostgreSQL');
+    client.release(); // Release client after successful connection
+  } catch (error) {
+    console.error('Failed to connect to PostgreSQL', error);
+  }
 };
 
-// Read expenses from the Excel file
+connectDb();
+
 app.get('/api/expenses', async (req, res) => {
   try {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.worksheets[0];
-    const headersExist = await checkHeaders(worksheet);
-
-    if (!headersExist) {
-      return res
-        .status(500)
-        .json({ error: 'Headers missing in the Excel file' });
-    }
-
-    const jsonData = [];
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (rowNumber > 1) {
-        jsonData.push({
-          personName: row.getCell(1).value,
-          amount: row.getCell(2).value,
-          givenDate: row.getCell(3).value,
-          returnDate: row.getCell(4).value,
-          interest: row.getCell(5).value,
-          remarks: row.getCell(6).value,
-          guid: row.getCell(7).value,
-        });
-      }
-    });
-
-    res.json(jsonData);
+    const result = await pool.query('SELECT * FROM expenses');
+    res.json(result.rows);
   } catch (error) {
-    console.error('Error reading Excel file:', error);
-    res.status(500).json({ error: 'Failed to read Excel file' });
+    console.error('Error fetching expenses:', error);
+    res.status(500).json({ error: 'Failed to retrieve expenses' });
   }
 });
 
-// Get expenses by personName
 app.get('/api/expenses/:guid', async (req, res) => {
+  const { guid } = req.params;
   try {
-    const { guid } = req.params;
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.worksheets[0];
-    const jsonData = worksheet.getSheetValues(); // Adjust if needed
-    const expenses = jsonData.slice(1).map((row) => ({
-      personName: row[1],
-      amount: row[2],
-      givenDate: row[3],
-      returnDate: row[4],
-      interest: row[5],
-      remarks: row[6],
-      guid: row[7],
-    }));
-    const filteredExpenses = expenses.filter(
-      (expense) => expense.guid === guid
-    );
-    res.json(filteredExpenses);
-  } catch (error) {
-    console.error('Error reading Excel file:', error);
-    res.status(500).json({ error: 'Failed to read Excel file' });
-  }
-});
+    console.log('Fetching expense with GUID:', guid);
+    const result = await pool.query('SELECT * FROM expenses WHERE guid = $1', [
+      guid,
+    ]);
 
-// Add new expenses to the Excel file
-app.post('/api/expenses', async (req, res) => {
-  try {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.worksheets[0];
-
-    let expenses = [];
-
-    if (Array.isArray(req.body)) {
-      expenses = req.body;
-    } else if (req.body.personName && req.body.amount) {
-      expenses = [req.body];
-    } else {
-      return res.status(400).json({ error: 'Invalid request format' });
-    }
-
-    const headersExist = await checkHeaders(worksheet);
-
-    if (!headersExist) {
-      // Add headers if they don't exist
-      worksheet.addRow([
-        'Person Name',
-        'Amount',
-        'Given Date',
-        'Return Date',
-        'Interest',
-        'Remarks',
-        'GUID',
-      ]);
-    }
-
-    // Add expenses without headers
-    expenses.forEach((expense) => {
-      worksheet.addRow([
-        expense.personName,
-        expense.amount,
-        expense.givenDate,
-        expense.returnDate,
-        expense.interest,
-        expense.remarks,
-        expense.guid,
-      ]);
-    });
-
-    await workbook.xlsx.writeFile(filePath);
-    res.json({ message: 'Expenses updated successfully' });
-  } catch (error) {
-    console.error('Error saving Excel file:', error);
-    res.status(500).json({ error: 'Failed to write to Excel file' });
-  }
-});
-
-// Update expense by personName
-app.put('/api/expenses/:guid', async (req, res) => {
-  try {
-    const { guid } = req.params;
-    const updatedExpense = req.body;
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.worksheets[0];
-
-    const headersExist = await checkHeaders(worksheet);
-
-    if (!headersExist) {
-      return res
-        .status(500)
-        .json({ error: 'Headers missing in the Excel file' });
-    }
-
-    let found = false;
-
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (row.getCell(7).value === guid) {
-        worksheet.getRow(rowNumber).values = [
-          updatedExpense.personName,
-          updatedExpense.amount,
-          updatedExpense.givenDate,
-          updatedExpense.returnDate,
-          updatedExpense.interest,
-          updatedExpense.remarks,
-          updatedExpense.guid,
-        ];
-        found = true;
-      }
-    });
-
-    if (!found) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Expense not found' });
     }
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching expense:', error);
+    res.status(500).json({ error: 'Failed to retrieve expense' });
+  }
+});
 
-    await workbook.xlsx.writeFile(filePath);
+app.post('/api/expenses', async (req, res) => {
+  const { personname, amount, givendate, returndate, interest, remarks, guid } =
+    req.body;
+  try {
+    const givenDate = givendate === '' ? null : givendate;
+    const returnDate = returndate === '' ? null : returndate;
+
+    await pool.query(
+      'INSERT INTO expenses (personname, amount, givendate, returndate, interest, remarks, guid) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [personname, amount, givenDate, returnDate, interest, remarks, guid]
+    );
+    res.json({ message: 'Expense added successfully' });
+  } catch (error) {
+    console.error('Error adding expense:', error);
+    res.status(500).json({ error: 'Failed to add expense' });
+  }
+});
+
+app.put('/api/expenses/:guid', async (req, res) => {
+  const { guid } = req.params;
+  const { personname, amount, givendate, returndate, interest, remarks } =
+    req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE expenses SET personname = $1, amount = $2, givendate = $3, returndate = $4, interest = $5, remarks = $6 WHERE guid = $7',
+      [personname, amount, givendate, returndate, interest, remarks, guid]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
     res.json({ message: 'Expense updated successfully' });
   } catch (error) {
-    console.error('Error updating Excel file:', error);
-    res.status(500).json({ error: 'Failed to update Excel file' });
+    console.error('Error updating expense:', error);
+    res.status(500).json({ error: 'Failed to update expense' });
   }
 });
 
-// Delete expense by personName
 app.delete('/api/expenses/:guid', async (req, res) => {
+  const { guid } = req.params;
   try {
-    const { guid } = req.params;
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.worksheets[0];
-
-    const headersExist = await checkHeaders(worksheet);
-
-    if (!headersExist) {
-      return res
-        .status(500)
-        .json({ error: 'Headers missing in the Excel file' });
-    }
-
-    let rowToDelete = null;
-
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (row.getCell(7).value === guid) {
-        rowToDelete = rowNumber;
-      }
-    });
-
-    if (!rowToDelete) {
+    const result = await pool.query('DELETE FROM expenses WHERE guid = $1', [
+      guid,
+    ]);
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Expense not found' });
     }
-
-    worksheet.spliceRows(rowToDelete, 1);
-
-    await workbook.xlsx.writeFile(filePath);
     res.json({ message: 'Expense deleted successfully' });
   } catch (error) {
-    console.error('Error deleting Excel file:', error);
-    res.status(500).json({ error: 'Failed to delete from Excel file' });
+    console.error('Error deleting expense:', error);
+    res.status(500).json({ error: 'Failed to delete expense' });
   }
 });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
